@@ -6,13 +6,13 @@
         xmlns:local="clr-namespace:Chat"
         xmlns:ViewModels="clr-namespace:Chat.ViewModels" x:Class="Chat.MainWindow"
         mc:Ignorable="d"
-        Title="Chat" Height="450" Width="800">
+        Title="Chat" Height="450" Width="800" MinHeight="400" MinWidth="400">
 	<Window.DataContext>
 		<ViewModels:MainWindowViewModel/>
 	</Window.DataContext>
 	<Grid>
 		<Grid.RowDefinitions>
-			<RowDefinition Height="0.5*" />
+			<RowDefinition Height="0.4*" />
 			<RowDefinition Height="2*" />
 			<RowDefinition Height="auto" />
 		</Grid.RowDefinitions>
@@ -22,14 +22,37 @@
 			<ColumnDefinition Width="auto" />
 		</Grid.ColumnDefinitions>
 
-		<TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding UserName}" Width="100" Height="20" HorizontalAlignment="Left"/>
-		<ListBox Grid.Row="1" Grid.Column="0" ItemsSource="{Binding Messages}" Margin="20,0,0,20"/>
-
-		<StackPanel Grid.Row="0" Grid.Column="1">
-			<Button Content="Connect" Command="{Binding Connect}" Width="50 " HorizontalAlignment="Right" Margin="0,20,10,0"/>
+		<StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" Margin="20,0,20,20">
+			<Label VerticalAlignment="Top" Margin="5">Name:</Label>
+			<TextBox 
+				Text="{Binding UserName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+				Width="100" 
+				Height="20"
+				VerticalAlignment="Top" 
+				Margin="5">
+				<TextBox.InputBindings>
+					<KeyBinding Command="{Binding EnterName}" Key="Enter" />
+				</TextBox.InputBindings>
+			</TextBox>
+			<TextBlock Text="{Binding UserName}" Width="100" Height="20"/>
 		</StackPanel>
-		<TextBox Grid.Row="2" Grid.Column="0" Text="{Binding MessageText}" HorizontalAlignment="Stretch" Margin="20,0,0,20"/>
-		<StackPanel Grid.Row="2" Margin="0,0,0,20">
+		
+		<ListBox Grid.Row="1" Grid.Column="0" ItemsSource="{Binding Messages}" Margin="20,0,20,20"/>
+		<Button 
+			Grid.Row="0"
+			Grid.Column="1" 
+			Content="Connect" 
+			Command="{Binding Connect}" 
+			Width="50" Height="20" 
+			HorizontalAlignment="Right" 
+			Margin="10,0,10,0"/>
+		<TextBox 
+			Grid.Row="2" 
+			Grid.Column="0" 
+			Text="{Binding MessageText, Mode=TwoWay}" 
+			HorizontalAlignment="Stretch" 
+			Margin="20,0,20,20"/>
+		<StackPanel Grid.Row="2" Margin="0,0,20,20">
 			<Button Content="Send" Command="{Binding Send}" Width="100" HorizontalAlignment="Right"/>
 		</StackPanel>
 	</Grid>
