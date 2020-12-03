@@ -1,0 +1,48 @@
+﻿<UserControl x:Class="Chat.Views.LogInView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Chat.Views" xmlns:ViewModels="clr-namespace:Chat.ViewModels"
+			 mc:Ignorable="d" 
+             MinHeight="100" MinWidth="250">
+	<UserControl.DataContext>
+		<ViewModels:UserViewModel/>
+	</UserControl.DataContext>
+	<Grid>
+		<StackPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="20" Height="35">
+			<Label VerticalAlignment="Top" Margin="5">Name:</Label>
+			<TextBox 
+				Text="{Binding UserName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+				Width="100" 
+				Height="20"
+				VerticalAlignment="Top" 
+				Margin="5">
+				<TextBox.InputBindings>
+					<KeyBinding Command="{Binding EnterName}" Key="Enter" />
+				</TextBox.InputBindings>
+			</TextBox>
+			<TextBlock Text="{Binding UserName}" Width="100" Height="20"/>
+		</StackPanel>
+		<Button
+            Name="OKButton"
+            Content="OK"
+            Height="23"
+            HorizontalAlignment="Right" 
+            Margin="0,0,93,12"
+            VerticalAlignment="Bottom" 
+            Width="75" 
+            IsDefault="True"
+            Command="{Binding OKButtonCommand}" />
+
+		<Button
+            Name="CancelButton"
+            Content="Cancel" 
+            Height="23" 
+            HorizontalAlignment="Right" 
+            Margin="0,0,12,12"
+            VerticalAlignment="Bottom"
+            Width="75" 
+            IsCancel="True" />
+	</Grid>
+</UserControl>
