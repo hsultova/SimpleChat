@@ -1,23 +1,15 @@
 ﻿using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using Chat.Helpers;
+using Chat.ViewModels.Base;
 
 namespace Chat.ViewModels
 {
-	class MainWindowViewModel : INotifyPropertyChanged
+	class MainWindowViewModel : BaseViewModel
 	{
 		public MainWindowViewModel()
 		{
 		}
-
-		#region INotifyPropertyChanged
-
-		public event PropertyChangedEventHandler PropertyChanged;
-		private void OnPropertyChanged([CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
-		#endregion
 
 		public ObservableCollection<string> Messages { get; set; } = new ObservableCollection<string>();
 
