@@ -1,8 +1,8 @@
 ﻿namespace Chat.Models
 {
-	public class User
+	public class UserModel
 	{
-		public User(int id, string name)
+		public UserModel(int id, string name)
 		{
 			Id = id;
 			Name = name;

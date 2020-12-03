@@ -9,7 +9,7 @@ using NUnit.Framework;
 namespace Chat.Tests
 {
     [TestFixture]
-    public class UserConstructorTests
+    public class UserModelConstructorTests
     {
 
         [Test]
@@ -20,7 +20,7 @@ namespace Chat.Tests
             int id = 0;
 
             //Act
-            var user = new User(id, name);
+            var user = new UserModel(id, name);
 
             //Assert
             Assert.That(user.Id.Equals(id));
@@ -36,7 +36,7 @@ namespace Chat.Tests
             int id = 0;
 
             //Act
-            var user = new User(0, name);
+            var user = new UserModel(0, name);
 
             //Assert
             Assert.That(user.Id.Equals(id));
