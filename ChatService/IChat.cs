@@ -15,13 +15,16 @@ namespace ChatService
 		bool Disconnect(User user);
 
 		[OperationContract]
-		string Send(Message message);
+		bool Send(Message message);
 
 		[OperationContract]
 		List<Message> GetMessages();
 
 		[OperationContract]
-		List<User> GetUsers();
+		List<User> GetConnectedUsers();
+
+		[OperationContract]
+		bool IsUserConnected(int Id);
 	}
 
 	[DataContract]
