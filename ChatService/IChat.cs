@@ -5,7 +5,7 @@ using System.ServiceModel;
 
 namespace ChatService
 {
-	[ServiceContract]
+	[ServiceContract(CallbackContract = typeof(IChatServiceCallback), SessionMode = SessionMode.Required)]
 	public interface IChat
 	{
 		[OperationContract]
@@ -15,7 +15,7 @@ namespace ChatService
 		bool Disconnect(User user);
 
 		[OperationContract]
-		bool Send(Message message);
+		void Send(Message message);
 
 		[OperationContract]
 		List<Message> GetMessages();
@@ -27,53 +27,41 @@ namespace ChatService
 		bool IsUserConnected(int Id);
 	}
 
+	internal interface IChatServiceCallback
+	{
+		[OperationContract(IsOneWay = true)]
+		void RefreshUsers(List<User> users);
+
+		[OperationContract(IsOneWay = true)]
+		void Receive(Message msg);
+
+		[OperationContract(IsOneWay = true)]
+		void UserConnect(User user);
+
+		[OperationContract(IsOneWay = true)]
+		void UserDisconnect(User user);
+	}
+
 	[DataContract]
 	public class User
 	{
-		int id;
-		string name = string.Empty;
+		[DataMember]
+		public int Id { get; set; }
 
 		[DataMember]
-		public int Id
-		{
-			get { return id; }
-			set { id = value; }
-		}
-
-		[DataMember]
-		public string Name
-		{
-			get { return name; }
-			set { name = value; }
-		}
+		public string Name { get; set; }
 	}
 
 	[DataContract]
 	public class Message
 	{
-		string content = string.Empty;
-		string userName;
-		DateTime dateTime;
+		[DataMember]
+		public string Content { get; set; }
 
 		[DataMember]
-		public string Content
-		{
-			get { return content; }
-			set { content = value; }
-		}
+		public string UserName { get; set; }
 
 		[DataMember]
-		public string UserName
-		{
-			get { return userName; }
-			set { userName = value; }
-		}
-
-		[DataMember]
-		public DateTime DateTime
-		{
-			get { return dateTime; }
-			set { dateTime = value; }
-		}
+		public DateTime DateTime { get; set; }
 	}
 }

@@ -1,19 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using System.ServiceModel;
 
 namespace ChatService
 {
+	[ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
 	public class ChatService : IChat
 	{
-		private readonly List<User> _connectedUsers = new List<User>();
+		private readonly Dictionary<User, IChatServiceCallback> _connectedUsers = new Dictionary<User, IChatServiceCallback>();
 		private readonly List<Message> _allMessages = new List<Message>();
 
 		virtual public bool Connect(User user)
 		{
-			if (user != null && !_connectedUsers.Contains(user))
+			if (user != null && !_connectedUsers.ContainsKey(user))
 			{
-				_connectedUsers.Add(user);
+				IChatServiceCallback callback = OperationContext.Current.GetCallbackChannel<IChatServiceCallback>();
+				_connectedUsers.Add(user, callback);
+				callback.RefreshUsers(_connectedUsers.Keys.ToList());
+				callback.UserConnect(user);
 				return true;
 			}
 
@@ -24,7 +28,9 @@ namespace ChatService
 		{
 			if (user != null)
 			{
+				_connectedUsers.TryGetValue(user, out IChatServiceCallback callback);
 				_connectedUsers.Remove(user);
+				callback.UserDisconnect(user);
 				return true;
 			}
 
@@ -38,13 +44,17 @@ namespace ChatService
 
 		virtual public List<User> GetConnectedUsers()
 		{
-			return _connectedUsers;
+			return _connectedUsers.Keys.ToList();
 		}
 
-		public bool Send(Message message)
+		public void Send(Message message)
 		{
 			_allMessages.Add(message);
-			return true;
+			foreach (User key in _connectedUsers.Keys.ToList())
+			{
+				IChatServiceCallback callback = _connectedUsers[key];
+				callback.Receive(message);
+			}
 		}
 
 		virtual public bool IsUserConnected(int Id)
