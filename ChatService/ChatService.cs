@@ -10,11 +10,13 @@ namespace ChatService
 		private readonly Dictionary<User, IChatServiceCallback> _connectedUsers = new Dictionary<User, IChatServiceCallback>();
 		private readonly List<Message> _allMessages = new List<Message>();
 
+		public IOperationContext OperationContextWrapper = new OperationContextWrapper();
+
 		virtual public bool Connect(User user)
 		{
 			if (user != null && !_connectedUsers.ContainsKey(user))
 			{
-				IChatServiceCallback callback = OperationContext.Current.GetCallbackChannel<IChatServiceCallback>();
+				IChatServiceCallback callback = OperationContextWrapper.GetCallbackChannel<IChatServiceCallback>();
 				_connectedUsers.Add(user, callback);
 				callback.RefreshUsers(_connectedUsers.Keys.ToList());
 				callback.UserConnect(user);

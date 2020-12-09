@@ -8,7 +8,6 @@ namespace ChatService.Tests
 	public class ChatServiceTests
 	{
 		private ChatService _chatService;
-		private ChatService _chatServiceFake;
 		private User _user;
 		private Message _message;
 
@@ -16,7 +15,6 @@ namespace ChatService.Tests
 		public void ChatServiceSetUp()
 		{
 			_chatService = new ChatService();
-			_chatServiceFake = Substitute.ForPartsOf<ChatService>();
 			_user = new User();
 			_message = new Message();
 		}
@@ -25,6 +23,10 @@ namespace ChatService.Tests
 		public void ConnectTest()
 		{
 			//Arrange
+			var operationContexWrapperFake = Substitute.For<IOperationContext>();
+			operationContexWrapperFake.GetCallbackChannel<IChatServiceCallback>().Returns(Substitute.For<IChatServiceCallback>());
+			_chatService.OperationContextWrapper = operationContexWrapperFake;
+
 			var isUserConnectedBefore = _chatService.IsUserConnected(_user.Id);
 
 			//Act
@@ -52,10 +54,11 @@ namespace ChatService.Tests
 		public void IsUserConnectedTest()
 		{
 			//Arrange
-			_chatServiceFake.GetConnectedUsers().Returns(new List<User> { _user });
+			ChatService chatServiceFake = Substitute.ForPartsOf<ChatService>();
+			chatServiceFake.GetConnectedUsers().Returns(new List<User> { _user });
 
 			//Act
-			var isUserConnected = _chatServiceFake.IsUserConnected(_user.Id);
+			var isUserConnected = chatServiceFake.IsUserConnected(_user.Id);
 
 			//Assert
 			Assert.That(isUserConnected == true);
