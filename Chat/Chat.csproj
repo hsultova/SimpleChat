@@ -74,7 +74,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
-    <Compile Include="Generator.cs" />
+    <Compile Include="Helpers\Generator.cs" />
     <Compile Include="Helpers\RelayCommand.cs" />
     <Compile Include="Models\MessageModel.cs" />
     <Compile Include="Models\UserModel.cs" />

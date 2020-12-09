@@ -59,7 +59,7 @@ namespace ChatService
 			}
 		}
 
-		virtual public bool IsUserConnected(int Id)
+		virtual public bool IsUserConnected(string Id)
 		{
 			var user = GetConnectedUsers().Where(u => u.Id == Id).FirstOrDefault();
 			return user != null;

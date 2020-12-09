@@ -8,9 +8,9 @@ namespace Chat.Helpers
 {
 	public static class Generator
 	{
-		public static int GenerateId()
+		public static string GenerateId()
 		{
-			return 0;
+			return string.Empty;
 		}
 	}
 }

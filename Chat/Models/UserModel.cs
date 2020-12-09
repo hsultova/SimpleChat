@@ -2,13 +2,13 @@
 {
 	public class UserModel
 	{
-		public UserModel(int id, string name)
+		public UserModel(string id, string name)
 		{
 			Id = id;
 			Name = name;
 		}
 
-		public int Id { get; private set; }
+		public string Id { get; private set; }
 
 		private const string AnonymousName = "Anonymous";
 

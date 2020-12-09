@@ -24,7 +24,7 @@ namespace ChatService
 		List<User> GetConnectedUsers();
 
 		[OperationContract]
-		bool IsUserConnected(int Id);
+		bool IsUserConnected(string Id);
 	}
 
 	public interface IChatServiceCallback
@@ -46,7 +46,7 @@ namespace ChatService
 	public class User
 	{
 		[DataMember]
-		public int Id { get; set; }
+		public string Id { get; set; }
 
 		[DataMember]
 		public string Name { get; set; }
