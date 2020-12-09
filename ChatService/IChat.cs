@@ -27,7 +27,7 @@ namespace ChatService
 		bool IsUserConnected(int Id);
 	}
 
-	internal interface IChatServiceCallback
+	public interface IChatServiceCallback
 	{
 		[OperationContract(IsOneWay = true)]
 		void RefreshUsers(List<User> users);
