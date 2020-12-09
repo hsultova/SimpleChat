@@ -10,7 +10,7 @@ namespace Chat.Helpers
 	{
 		public static string GenerateId()
 		{
-			return string.Empty;
+			return Guid.NewGuid().ToString();
 		}
 	}
 }

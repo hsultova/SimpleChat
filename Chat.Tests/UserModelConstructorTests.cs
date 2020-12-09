@@ -1,4 +1,5 @@
-﻿using Chat.Models;
+﻿using System;
+using Chat.Models;
 using NUnit.Framework;
 
 namespace Chat.Tests
@@ -12,7 +13,7 @@ namespace Chat.Tests
         {
             //Arrange
             string name = "TestName";
-            int id = 0;
+            string id = Guid.NewGuid().ToString();
 
             //Act
             var user = new UserModel(id, name);
@@ -28,10 +29,10 @@ namespace Chat.Tests
         public void NoNameConstructorTest(string name)
         {
             //Arrange
-            int id = 0;
+            string id = Guid.NewGuid().ToString();
 
             //Act
-            var user = new UserModel(0, name);
+            var user = new UserModel(id, name);
 
             //Assert
             Assert.That(user.Id.Equals(id));
