@@ -7,16 +7,16 @@ namespace ChatService.Tests
 	[TestFixture]
 	public class ChatServiceTests
 	{
-		private ChatService _service;
-		private ChatService _serviceFake;
+		private ChatService _chatService;
+		private ChatService _chatServiceFake;
 		private User _user;
 		private Message _message;
 
 		[SetUp]
 		public void ChatServiceSetUp()
 		{
-			_service = new ChatService();
-			_serviceFake = Substitute.ForPartsOf<ChatService>();
+			_chatService = new ChatService();
+			_chatServiceFake = Substitute.ForPartsOf<ChatService>();
 			_user = new User();
 			_message = new Message();
 		}
@@ -25,11 +25,11 @@ namespace ChatService.Tests
 		public void ConnectTest()
 		{
 			//Arrange
-			var isUserConnectedBefore = _service.IsUserConnected(_user.Id);
+			var isUserConnectedBefore = _chatService.IsUserConnected(_user.Id);
 
 			//Act
-			var isServiceConnected = _service.Connect(_user);
-			var isUserConnectedAfter = _service.IsUserConnected(_user.Id);
+			var isServiceConnected = _chatService.Connect(_user);
+			var isUserConnectedAfter = _chatService.IsUserConnected(_user.Id);
 
 			//Assert
 			Assert.That(isUserConnectedBefore == false);
@@ -42,7 +42,7 @@ namespace ChatService.Tests
 		public void ConnectNoUserTest(User user)
 		{
 			//Act
-			var isServiceConnected = _service.Connect(user);
+			var isServiceConnected = _chatService.Connect(user);
 
 			//Assert
 			Assert.That(isServiceConnected == false);
@@ -52,10 +52,10 @@ namespace ChatService.Tests
 		public void IsUserConnectedTest()
 		{
 			//Arrange
-			_serviceFake.GetConnectedUsers().Returns(new List<User> { _user });
+			_chatServiceFake.GetConnectedUsers().Returns(new List<User> { _user });
 
 			//Act
-			var isUserConnected = _serviceFake.IsUserConnected(_user.Id);
+			var isUserConnected = _chatServiceFake.IsUserConnected(_user.Id);
 
 			//Assert
 			Assert.That(isUserConnected == true);
