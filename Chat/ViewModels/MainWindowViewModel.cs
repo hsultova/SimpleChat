@@ -20,11 +20,32 @@ namespace Chat.ViewModels
 
 		public void Dispose()
 		{
+			if (CurrentUser == null)
+				return;
+
+			TcpServiceReference.User user = new TcpServiceReference.User { Id = CurrentUser.Id, Name = CurrentUser.Name };
+			if (_client != null)
+			{
+				if (_client.State == CommunicationState.Faulted)
+				{
+					_client.Abort();
+					_client = null;
+				}
+				else
+				{
+					_client.Disconnect(user);
+				}
+			}
+		}
+
+		~MainWindowViewModel()
+		{
+			Dispose();
 		}
 
 		private TcpServiceReference.ChatClient _client;
 
-		public ObservableCollection<string> Messages { get; set; } = new ObservableCollection<string>();
+		public ObservableCollection<MessageModel> Messages { get; set; } = new ObservableCollection<MessageModel>();
 
 		public UserModel CurrentUser { get; set; }
 
@@ -53,8 +74,22 @@ namespace Chat.ViewModels
 			set
 			{
 				_userName = value;
-				CurrentUser = new UserModel(Generator.GenerateId(), UserName);
 				OnPropertyChanged(nameof(UserName));
+			}
+		}
+
+
+		private bool _isUserNameEnabled = true;
+		public bool IsUserNameEnabled
+		{
+			get
+			{
+				return _isUserNameEnabled;
+			}
+			set
+			{
+				_isUserNameEnabled = value;
+				OnPropertyChanged(nameof(IsUserNameEnabled));
 			}
 		}
 
@@ -70,18 +105,19 @@ namespace Chat.ViewModels
 
 		private void OnEnterName()
 		{
+			IsUserNameEnabled = false;
 		}
 
 		private void OnConnect()
 		{
-			var userModel = new UserModel(Generator.GenerateId(), UserName);
-			TcpServiceReference.User user = new TcpServiceReference.User { Id = userModel.Id, Name = userModel.Name };
+			CurrentUser = new UserModel(Generator.GenerateId(), UserName);
+			TcpServiceReference.User user = new TcpServiceReference.User { Id = CurrentUser.Id, Name = CurrentUser.Name };
 			_client.Connect(user);
 		}
 
 		private void OnSend()
 		{
-			TcpServiceReference.Message message = new TcpServiceReference.Message { Content = MessageText, DateTime = DateTime.Now, UserName = UserName };
+			var message = new TcpServiceReference.Message { Content = MessageText, DateTime = DateTime.Now, UserName = UserName };
 			_client.Send(message);
 		}
 
@@ -92,7 +128,8 @@ namespace Chat.ViewModels
 
 		public void Receive(TcpServiceReference.Message msg)
 		{
-			Application.Current.Dispatcher.Invoke(() => { Messages.Add(msg.Content); });
+			var message = new MessageModel(msg.Content, msg.DateTime, msg.UserName);
+			Application.Current.Dispatcher.Invoke(() => { Messages.Add(message); });
 		}
 
 		public void UserConnect(TcpServiceReference.User user)

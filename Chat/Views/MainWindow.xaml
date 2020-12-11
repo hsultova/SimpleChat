@@ -29,15 +29,27 @@
 				Width="100" 
 				Height="20"
 				VerticalAlignment="Top" 
-				Margin="5">
+				Margin="5"
+				IsEnabled="{Binding IsUserNameEnabled, Mode=TwoWay}">
 				<TextBox.InputBindings>
 					<KeyBinding Command="{Binding EnterName}" Key="Enter" />
 				</TextBox.InputBindings>
 			</TextBox>
-			<TextBlock Text="{Binding UserName}" Width="100" Height="20"/>
 		</StackPanel>
-		
-		<ListBox Grid.Row="1" Grid.Column="0" ItemsSource="{Binding Messages}" Margin="20,0,20,20"/>
+
+		<ListBox Grid.Row="1" Grid.Column="0" ItemsSource="{Binding Messages}" Margin="20,0,20,20">
+			<ListBox.ItemTemplate>
+				<DataTemplate>
+					<WrapPanel>
+						<TextBlock Text="{Binding UserName}" FontWeight="Bold" />
+						<TextBlock Text=", "></TextBlock>
+						<TextBlock Text="{Binding DateTimeDisplay}" FontStyle="Italic"/>
+						<TextBlock Text=": "></TextBlock>
+						<TextBlock Text="{Binding Content}" />
+					</WrapPanel>
+				</DataTemplate>
+			</ListBox.ItemTemplate>
+		</ListBox>
 		<Button 
 			Grid.Row="0"
 			Grid.Column="1" 
