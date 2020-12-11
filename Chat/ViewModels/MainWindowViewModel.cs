@@ -20,21 +20,18 @@ namespace Chat.ViewModels
 
 		public void Dispose()
 		{
-			if (CurrentUser == null)
+			if (CurrentUser == null || _client == null)
 				return;
 
-			TcpServiceReference.User user = new TcpServiceReference.User { Id = CurrentUser.Id, Name = CurrentUser.Name };
-			if (_client != null)
+			if (_client.State == CommunicationState.Faulted)
 			{
-				if (_client.State == CommunicationState.Faulted)
-				{
-					_client.Abort();
-					_client = null;
-				}
-				else
-				{
-					_client.Disconnect(user);
-				}
+				_client.Abort();
+				_client = null;
+			}
+			else
+			{
+				var user = new TcpServiceReference.User { Id = CurrentUser.Id, Name = CurrentUser.Name };
+				_client.Disconnect(user);
 			}
 		}
 
@@ -48,6 +45,7 @@ namespace Chat.ViewModels
 		public ObservableCollection<MessageModel> Messages { get; set; } = new ObservableCollection<MessageModel>();
 
 		public UserModel CurrentUser { get; set; }
+
 
 		private string _messageText;
 		public string MessageText
@@ -63,7 +61,6 @@ namespace Chat.ViewModels
 			}
 		}
 
-
 		private string _userName;
 		public string UserName
 		{
@@ -77,7 +74,6 @@ namespace Chat.ViewModels
 				OnPropertyChanged(nameof(UserName));
 			}
 		}
-
 
 		private bool _isUserNameEnabled = true;
 		public bool IsUserNameEnabled
@@ -96,12 +92,10 @@ namespace Chat.ViewModels
 		#region Commands
 
 		public ICommand EnterName { get => new RelayCommand(OnEnterName); }
-
 		public ICommand Connect { get => new RelayCommand(OnConnect); }
 		public ICommand Send { get => new RelayCommand(OnSend); }
 
 		#endregion
-
 
 		private void OnEnterName()
 		{
@@ -123,7 +117,6 @@ namespace Chat.ViewModels
 
 		public void RefreshUsers(TcpServiceReference.User[] users)
 		{
-
 		}
 
 		public void Receive(TcpServiceReference.Message msg)
@@ -134,12 +127,10 @@ namespace Chat.ViewModels
 
 		public void UserConnect(TcpServiceReference.User user)
 		{
-
 		}
 
 		public void UserDisconnect(TcpServiceReference.User user)
 		{
-
 		}
 	}
 }
