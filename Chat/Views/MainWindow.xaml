@@ -35,6 +35,22 @@
 					<KeyBinding Command="{Binding EnterName}" Key="Enter" />
 				</TextBox.InputBindings>
 			</TextBox>
+			<TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding Notification, NotifyOnTargetUpdated=True}" Margin="50,0,0,0">
+				<TextBlock.Triggers>
+					<EventTrigger RoutedEvent="Binding.TargetUpdated">
+						<BeginStoryboard>
+							<Storyboard>
+								<DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="Opacity">
+									<EasingDoubleKeyFrame KeyTime="0" Value="0"/>
+									<EasingDoubleKeyFrame KeyTime="0:0:0.25" Value="1"/>
+									<EasingDoubleKeyFrame KeyTime="0:0:4" Value="1"/>
+									<EasingDoubleKeyFrame KeyTime="0:0:5" Value="0"/>
+								</DoubleAnimationUsingKeyFrames>
+							</Storyboard>
+						</BeginStoryboard>
+					</EventTrigger>
+				</TextBlock.Triggers>
+			</TextBlock>
 		</StackPanel>
 
 		<ListBox Grid.Row="1" Grid.Column="0" ItemsSource="{Binding Messages}" Margin="20,0,20,20">
@@ -61,9 +77,13 @@
 		<TextBox 
 			Grid.Row="2" 
 			Grid.Column="0" 
-			Text="{Binding MessageText, Mode=TwoWay}" 
+			Text="{Binding MessageText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
 			HorizontalAlignment="Stretch" 
-			Margin="20,0,20,20"/>
+			Margin="20,0,20,20">
+			<TextBox.InputBindings>
+				<KeyBinding Command="{Binding EnterMessage}" Key="Enter" />
+			</TextBox.InputBindings>
+		</TextBox>
 		<StackPanel Grid.Row="2" Margin="0,0,20,20">
 			<Button Content="Send" Command="{Binding Send}" Width="100" HorizontalAlignment="Right"/>
 		</StackPanel>

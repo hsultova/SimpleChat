@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.ServiceModel;
 using System.Windows;
 using System.Windows.Input;
@@ -75,6 +76,20 @@ namespace Chat.ViewModels
 			}
 		}
 
+		private string _notification;
+		public string Notification
+		{
+			get
+			{
+				return _notification;
+			}
+			set
+			{
+				_notification = value;
+				OnPropertyChanged(nameof(Notification));
+			}
+		}
+
 		private bool _isUserNameEnabled = true;
 		public bool IsUserNameEnabled
 		{
@@ -92,6 +107,7 @@ namespace Chat.ViewModels
 		#region Commands
 
 		public ICommand EnterName { get => new RelayCommand(OnEnterName); }
+		public ICommand EnterMessage { get => new RelayCommand(OnEnterMessage); }
 		public ICommand Connect { get => new RelayCommand(OnConnect); }
 		public ICommand Send { get => new RelayCommand(OnSend); }
 
@@ -102,8 +118,20 @@ namespace Chat.ViewModels
 			IsUserNameEnabled = false;
 		}
 
+		private void OnEnterMessage()
+		{
+			OnSend();
+		}
+
 		private void OnConnect()
 		{
+			var users = _client.GetConnectedUsers().ToList();
+			if(users.Where(u => u.Name == CurrentUser?.Name).FirstOrDefault() != null)
+			{
+				Notification = $"{CurrentUser.Name} is already connected.";
+				return;
+			}
+
 			CurrentUser = new UserModel(Generator.GenerateId(), UserName);
 			TcpServiceReference.User user = new TcpServiceReference.User { Id = CurrentUser.Id, Name = CurrentUser.Name };
 			_client.Connect(user);
@@ -113,6 +141,7 @@ namespace Chat.ViewModels
 		{
 			var message = new TcpServiceReference.Message { Content = MessageText, DateTime = DateTime.Now, UserName = UserName };
 			_client.Send(message);
+			MessageText = string.Empty;
 		}
 
 		public void RefreshUsers(TcpServiceReference.User[] users)
@@ -127,6 +156,7 @@ namespace Chat.ViewModels
 
 		public void UserConnect(TcpServiceReference.User user)
 		{
+			Notification = $"{DateTime.Now:HH:mm}: {user.Name} has just enter this chat.";
 		}
 
 		public void UserDisconnect(TcpServiceReference.User user)
