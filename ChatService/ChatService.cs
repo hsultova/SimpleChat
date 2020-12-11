@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
 
@@ -7,36 +8,43 @@ namespace ChatService
 	[ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
 	public class ChatService : IChat
 	{
-		private readonly Dictionary<User, IChatServiceCallback> _connectedUsers = new Dictionary<User, IChatServiceCallback>();
+		private readonly Dictionary<string, IChatServiceCallback> _userCallbackPairs = new Dictionary<string, IChatServiceCallback>();
+		private readonly List<User> _connectedUsers = new List<User>();
 		private readonly List<Message> _allMessages = new List<Message>();
 
 		public IOperationContext OperationContextWrapper = new OperationContextWrapper();
 
 		virtual public bool Connect(User user)
 		{
-			if (user != null && !_connectedUsers.ContainsKey(user))
-			{
-				IChatServiceCallback callback = OperationContextWrapper.GetCallbackChannel<IChatServiceCallback>();
-				_connectedUsers.Add(user, callback);
-				callback.RefreshUsers(_connectedUsers.Keys.ToList());
-				callback.UserConnect(user);
-				return true;
-			}
+			if (user == null && _connectedUsers.Where(u => u.Id == user.Id).FirstOrDefault() != null)
+				return false;
 
-			return false;
+			IChatServiceCallback callback = OperationContextWrapper.GetCallbackChannel<IChatServiceCallback>();
+			if (callback == null)
+				return false;
+
+			_userCallbackPairs.Add(user.Id, callback);
+			_connectedUsers.Add(user);
+			callback.RefreshUsers(_connectedUsers);
+			callback.UserConnect(user);
+			return true;
 		}
 
 		public bool Disconnect(User user)
 		{
-			if (user != null)
+			if (user == null)
+				return false;
+
+			_userCallbackPairs.Remove(user.Id);
+			_connectedUsers.RemoveAll(u => u.Id == user.Id);
+
+			foreach (IChatServiceCallback callback in _userCallbackPairs.Values)
 			{
-				_connectedUsers.TryGetValue(user, out IChatServiceCallback callback);
-				_connectedUsers.Remove(user);
+				callback.RefreshUsers(_connectedUsers);
 				callback.UserDisconnect(user);
-				return true;
 			}
 
-			return false;
+			return true;
 		}
 
 		public List<Message> GetMessages()
@@ -46,16 +54,16 @@ namespace ChatService
 
 		virtual public List<User> GetConnectedUsers()
 		{
-			return _connectedUsers.Keys.ToList();
+			return _connectedUsers;
 		}
 
 		public void Send(Message message)
 		{
 			_allMessages.Add(message);
-			foreach (User key in _connectedUsers.Keys.ToList())
+			foreach (User user in _connectedUsers)
 			{
-				IChatServiceCallback callback = _connectedUsers[key];
-				callback.Receive(message);
+				if (_userCallbackPairs.TryGetValue(user.Id, out IChatServiceCallback callback))
+					callback?.Receive(message);
 			}
 		}
 

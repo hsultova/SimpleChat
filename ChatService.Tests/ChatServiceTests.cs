@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using NSubstitute;
 using NUnit.Framework;
 
@@ -15,18 +16,19 @@ namespace ChatService.Tests
 		public void ChatServiceSetUp()
 		{
 			_chatService = new ChatService();
-			_user = new User();
-			_message = new Message();
+			_user = new User { Id = Guid.NewGuid().ToString(), Name = "TestUser" };
+			_message = new Message { Content = "Test content", DateTime = DateTime.Now, UserName = "TestUser"};
+
+			//Add fake operation context wrapper with default chat service callback
+			var operationContexWrapperFake = Substitute.For<IOperationContext>();
+			operationContexWrapperFake.GetCallbackChannel<IChatServiceCallback>().Returns(Substitute.For<IChatServiceCallback>());
+			_chatService.OperationContextWrapper = operationContexWrapperFake;
 		}
 
 		[Test]
 		public void ConnectTest()
 		{
 			//Arrange
-			var operationContexWrapperFake = Substitute.For<IOperationContext>();
-			operationContexWrapperFake.GetCallbackChannel<IChatServiceCallback>().Returns(Substitute.For<IChatServiceCallback>());
-			_chatService.OperationContextWrapper = operationContexWrapperFake;
-
 			var isUserConnectedBefore = _chatService.IsUserConnected(_user.Id);
 
 			//Act
@@ -63,11 +65,5 @@ namespace ChatService.Tests
 			//Assert
 			Assert.That(isUserConnected == true);
 		}
-
-		//[Test]
-		//public void SendTest()
-		//{
-		//	_service.Send(_message);
-		//}
 	}
 }
