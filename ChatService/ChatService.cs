@@ -14,6 +14,8 @@ namespace ChatService
 
 		public IOperationContext OperationContextWrapper = new OperationContextWrapper();
 
+		object syncObj = new object();
+
 		virtual public bool Connect(User user)
 		{
 			if (user == null || _connectedUsers.Where(u => u.Id == user.Id).FirstOrDefault() != null)
@@ -22,13 +24,15 @@ namespace ChatService
 			IChatServiceCallback currentCallback = OperationContextWrapper.GetCallbackChannel<IChatServiceCallback>();
 			if (currentCallback == null)
 				return false;
-
-			_userCallbackPairs.Add(user.Id, currentCallback);
-			_connectedUsers.Add(user);
-			foreach (IChatServiceCallback callback in _userCallbackPairs.Values)
+			lock (syncObj)
 			{
-				callback.RefreshUsers(_connectedUsers);
-				callback.UserConnect(user);
+				_userCallbackPairs.Add(user.Id, currentCallback);
+				_connectedUsers.Add(user);
+				foreach (IChatServiceCallback callback in _userCallbackPairs.Values)
+				{
+					callback.RefreshUsers(_connectedUsers);
+					callback.UserConnect(user);
+				}
 			}
 			return true;
 		}
@@ -38,13 +42,16 @@ namespace ChatService
 			if (user == null)
 				return false;
 
-			_userCallbackPairs.Remove(user.Id);
-			_connectedUsers.RemoveAll(u => u.Id == user.Id);
-
-			foreach (IChatServiceCallback callback in _userCallbackPairs.Values)
+			lock(syncObj)
 			{
-				callback.RefreshUsers(_connectedUsers);
-				callback.UserDisconnect(user);
+				_userCallbackPairs.Remove(user.Id);
+				_connectedUsers.RemoveAll(u => u.Id == user.Id);
+
+				foreach (IChatServiceCallback callback in _userCallbackPairs.Values)
+				{
+					callback.RefreshUsers(_connectedUsers);
+					callback.UserDisconnect(user);
+				}
 			}
 
 			return true;
@@ -62,11 +69,14 @@ namespace ChatService
 
 		public void Send(Message message)
 		{
-			_allMessages.Add(message);
-			foreach (User user in _connectedUsers)
+			lock(syncObj)
 			{
-				if (_userCallbackPairs.TryGetValue(user.Id, out IChatServiceCallback callback))
-					callback?.Receive(message);
+				_allMessages.Add(message);
+				foreach (User user in _connectedUsers)
+				{
+					if (_userCallbackPairs.TryGetValue(user.Id, out IChatServiceCallback callback))
+						callback?.Receive(message);
+				}
 			}
 		}
 
