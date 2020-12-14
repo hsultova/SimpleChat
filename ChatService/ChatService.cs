@@ -16,7 +16,7 @@ namespace ChatService
 
 		virtual public bool Connect(User user)
 		{
-			if (user == null && _connectedUsers.Where(u => u.Id == user.Id).FirstOrDefault() != null)
+			if (user == null || _connectedUsers.Where(u => u.Id == user.Id).FirstOrDefault() != null)
 				return false;
 
 			IChatServiceCallback callback = OperationContextWrapper.GetCallbackChannel<IChatServiceCallback>();
