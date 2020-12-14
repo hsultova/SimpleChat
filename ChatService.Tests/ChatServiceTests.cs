@@ -42,6 +42,22 @@ namespace ChatService.Tests
 		}
 
 		[Test]
+		public void DisconnectTest()
+		{
+			//Arrange
+			_chatService.Connect(_user);
+			var isUserConnectedBefore = _chatService.IsUserConnected(_user.Id);
+
+			//Act
+			_chatService.Disconnect(_user);
+			var isUserConnectedAfter = _chatService.IsUserConnected(_user.Id);
+
+			//Assert
+			Assert.That(isUserConnectedBefore == true);
+			Assert.That(isUserConnectedAfter == false);
+		}
+
+		[Test]
 		[TestCase(null)]
 		public void ConnectNoUserTest(User user)
 		{

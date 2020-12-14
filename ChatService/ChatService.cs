@@ -24,6 +24,7 @@ namespace ChatService
 			IChatServiceCallback currentCallback = OperationContextWrapper.GetCallbackChannel<IChatServiceCallback>();
 			if (currentCallback == null)
 				return false;
+
 			lock (syncObj)
 			{
 				_userCallbackPairs.Add(user.Id, currentCallback);
