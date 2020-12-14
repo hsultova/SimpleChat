@@ -19,6 +19,7 @@
 
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="*"/>
+			<ColumnDefinition Width="2*"/>
 			<ColumnDefinition Width="auto" />
 		</Grid.ColumnDefinitions>
 
@@ -34,26 +35,40 @@
 				<TextBox.InputBindings>
 					<KeyBinding Command="{Binding EnterName}" Key="Enter" />
 				</TextBox.InputBindings>
-			</TextBox>
-			<TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding Notification, NotifyOnTargetUpdated=True}" Margin="50,0,0,0">
-				<TextBlock.Triggers>
-					<EventTrigger RoutedEvent="Binding.TargetUpdated">
-						<BeginStoryboard>
-							<Storyboard>
-								<DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="Opacity">
-									<EasingDoubleKeyFrame KeyTime="0" Value="0"/>
-									<EasingDoubleKeyFrame KeyTime="0:0:0.25" Value="1"/>
-									<EasingDoubleKeyFrame KeyTime="0:0:4" Value="1"/>
-									<EasingDoubleKeyFrame KeyTime="0:0:5" Value="0"/>
-								</DoubleAnimationUsingKeyFrames>
-							</Storyboard>
-						</BeginStoryboard>
-					</EventTrigger>
-				</TextBlock.Triggers>
-			</TextBlock>
+			</TextBox>			
 		</StackPanel>
 
-		<ListBox Grid.Row="1" Grid.Column="0" ItemsSource="{Binding Messages}" Margin="20,0,20,20">
+		<TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Notification, NotifyOnTargetUpdated=True}" Margin="50,0,0,0">
+			<TextBlock.Triggers>
+				<EventTrigger RoutedEvent="Binding.TargetUpdated">
+					<BeginStoryboard>
+						<Storyboard>
+							<DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="Opacity">
+								<EasingDoubleKeyFrame KeyTime="0" Value="0"/>
+								<EasingDoubleKeyFrame KeyTime="0:0:0.25" Value="1"/>
+								<EasingDoubleKeyFrame KeyTime="0:0:4" Value="1"/>
+								<EasingDoubleKeyFrame KeyTime="0:0:5" Value="0"/>
+							</DoubleAnimationUsingKeyFrames>
+						</Storyboard>
+					</BeginStoryboard>
+				</EventTrigger>
+			</TextBlock.Triggers>
+		</TextBlock>
+
+		<ListBox Grid.Row="1" Grid.RowSpan="2" Grid.Column="0" ItemsSource="{Binding ConnectedUsers}" Margin="20,20,20,20">
+			<ListBox.ItemTemplate>
+				<DataTemplate>
+					<WrapPanel>
+						<TextBlock Text="{Binding Name}" FontWeight="Bold" />
+					</WrapPanel>
+				</DataTemplate>
+			</ListBox.ItemTemplate>
+		</ListBox>
+		<StackPanel Grid.Row="1" Margin="20,0,20,20">
+			<TextBlock>Users: </TextBlock>
+		</StackPanel>
+
+		<ListBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Messages}" Margin="20,20,20,20">
 			<ListBox.ItemTemplate>
 				<DataTemplate>
 					<WrapPanel>
@@ -68,7 +83,7 @@
 		</ListBox>
 		<Button 
 			Grid.Row="0"
-			Grid.Column="1" 
+			Grid.Column="2" 
 			Content="Connect" 
 			Command="{Binding Connect}" 
 			Width="50" Height="20" 
@@ -76,7 +91,7 @@
 			Margin="10,0,10,0"/>
 		<TextBox 
 			Grid.Row="2" 
-			Grid.Column="0" 
+			Grid.Column="1" 
 			Text="{Binding MessageText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
 			HorizontalAlignment="Stretch" 
 			Margin="20,0,20,20">
@@ -84,7 +99,7 @@
 				<KeyBinding Command="{Binding EnterMessage}" Key="Enter" />
 			</TextBox.InputBindings>
 		</TextBox>
-		<StackPanel Grid.Row="2" Margin="0,0,20,20">
+		<StackPanel Grid.Row="2" Grid.Column="1" Margin="0,0,20,20">
 			<Button Content="Send" Command="{Binding Send}" Width="100" HorizontalAlignment="Right"/>
 		</StackPanel>
 	</Grid>

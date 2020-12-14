@@ -44,6 +44,7 @@ namespace Chat.ViewModels
 		private TcpServiceReference.ChatClient _client;
 
 		public ObservableCollection<MessageModel> Messages { get; set; } = new ObservableCollection<MessageModel>();
+		public ObservableCollection<UserModel> ConnectedUsers { get; set; } = new ObservableCollection<UserModel>();
 
 		public UserModel CurrentUser { get; set; }
 
@@ -126,13 +127,14 @@ namespace Chat.ViewModels
 		private void OnConnect()
 		{
 			var users = _client.GetConnectedUsers().ToList();
-			if(users.Where(u => u.Name == CurrentUser?.Name).FirstOrDefault() != null)
+			if (users.Where(u => u.Name == CurrentUser?.Name).FirstOrDefault() != null)
 			{
 				Notification = $"{CurrentUser.Name} is already connected.";
 				return;
 			}
 
 			CurrentUser = new UserModel(Generator.GenerateId(), UserName);
+			ConnectedUsers.Add(CurrentUser);
 			TcpServiceReference.User user = new TcpServiceReference.User { Id = CurrentUser.Id, Name = CurrentUser.Name };
 			_client.Connect(user);
 		}
@@ -146,6 +148,11 @@ namespace Chat.ViewModels
 
 		public void RefreshUsers(TcpServiceReference.User[] users)
 		{
+			Application.Current.Dispatcher.Invoke(() => { ConnectedUsers.Clear(); });
+			foreach (var user in users)
+			{
+				Application.Current.Dispatcher.Invoke(() => { ConnectedUsers.Add(new UserModel(user.Id, user.Name)); });
+			}
 		}
 
 		public void Receive(TcpServiceReference.Message msg)
@@ -161,6 +168,7 @@ namespace Chat.ViewModels
 
 		public void UserDisconnect(TcpServiceReference.User user)
 		{
+			Notification = $"{DateTime.Now:HH:mm}: {user.Name} has just exit this chat.";
 		}
 	}
 }

@@ -19,14 +19,17 @@ namespace ChatService
 			if (user == null || _connectedUsers.Where(u => u.Id == user.Id).FirstOrDefault() != null)
 				return false;
 
-			IChatServiceCallback callback = OperationContextWrapper.GetCallbackChannel<IChatServiceCallback>();
-			if (callback == null)
+			IChatServiceCallback currentCallback = OperationContextWrapper.GetCallbackChannel<IChatServiceCallback>();
+			if (currentCallback == null)
 				return false;
 
-			_userCallbackPairs.Add(user.Id, callback);
+			_userCallbackPairs.Add(user.Id, currentCallback);
 			_connectedUsers.Add(user);
-			callback.RefreshUsers(_connectedUsers);
-			callback.UserConnect(user);
+			foreach (IChatServiceCallback callback in _userCallbackPairs.Values)
+			{
+				callback.RefreshUsers(_connectedUsers);
+				callback.UserConnect(user);
+			}
 			return true;
 		}
 
